@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kasir Sederhana</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .total-section {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #eee;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .payment-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .nota {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        .nota-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nota-detail {
+            margin-bottom: 15px;
+        }
+        .nota-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .nota-total {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #ccc;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .secondary-btn {
+            background: #95a5a6;
+        }
+        .secondary-btn:hover {
+            background: #7f8c8d;
+        }
+        .success-btn {
+            background: #2ecc71;
+        }
+        .success-btn:hover {
+            background: #27ae60;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .nota, .nota * {
+                visibility: visible;
+            }
+            .nota {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistem Kasir Sederhana</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Input Transaksi</h2>
+            
+            <div class="input-group">
+                <label for="item">Nama Barang</label>
+                <select id="item">
+                    <option value="">Pilih Barang</option>
+                    <option value="Kopi Hitam">Kopi Hitam - Rp 15.000</option>
+                    <option value="Cappuccino">Cappuccino - Rp 20.000</option>
+                    <option value="Latte">Latte - Rp 22.000</option>
+                    <option value="Espresso">Espresso - Rp 18.000</option>
+                    <option value="Croissant">Croissant - Rp 12.000</option>
+                    <option value="Sandwich">Sandwich - Rp 25.000</option>
+                    <option value="Salad Buah">Salad Buah - Rp 18.000</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="quantity">Jumlah</label>
+                <input type="number" id="quantity" min="1" value="1">
+            </div>
+            
+            <button id="add-item">Tambah ke Keranjang</button>
+            
+            <h2>Keranjang Belanja</h2>
+            <table id="cart">
+                <thead>
+                    <tr>
+                        <th>Barang</th>
+                        <th>Harga</th>
+                        <th>Jumlah</th>
+                        <th>Subtotal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Items will be added here dynamically -->
+                </tbody>
+            </table>
+            
+            <div class="total-section">
+                Total: Rp <span id="total-amount">0</span>
+            </div>
+            
+            <div class="payment-section">
+                <div class="input-group">
+                    <label for="payment">Jumlah Bayar (Rp)</label>
+                    <input type="number" id="payment" min="0">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="reset" class="secondary-btn">Reset Transaksi</button>
+                    <button id="pay" class="success-btn">Bayar Sekarang</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Nota Transaksi</h2>
+            <div id="receipt" class="nota">
+                <div class="nota-header">
+                    <h2>KEDAI KOPI ANANDA</h2>
+                    <p>Jl. Contoh No. 123, Jakarta</p>
+                    <p>Telp: (021) 123-4567</p>
+                </div>
+                
+                <div class="nota-detail">
+                    <p>No. Nota: <span id="receipt-number">TRX-001</span></p>
+                    <p>Tanggal: <span id="receipt-date">01/01/2023 10:00:00</span></p>
+                </div>
+                
+                <div id="receipt-items">
+                    <!-- Items will be added here dynamically -->
+                </div>
+                
+                <div class="nota-total">
+                    <div class="nota-item">
+                        <span>Total:</span>
+                        <span id="receipt-total">Rp 0</span>
+                    </div>
+                    <div class="nota-item">
+                        <span>Bayar:</span>
+                        <span id="receipt-payment">Rp 0</span>
+                    </div>
+                    <div class="nota-item">
+                        <span>Kembali:</span>
+                        <span id="receipt-change">Rp 0</span>
+                    </div>
+                </div>
+                
+                <p style="text-align: center; margin-top: 20px;">Terima kasih atas kunjungan Anda!</p>
+                
+                <div class="action-buttons">
+                    <button onclick="window.print()" class="success-btn">Cetak Nota</button>
+                    <button id="new-transaction" class="secondary-btn">Transaksi Baru</button>
+                </div>
+            </div>
+            
+            <div id="no-receipt" style="text-align: center; padding: 40px 0;">
+                <p>Nota akan muncul setelah melakukan pembayaran</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Data harga barang
+            const items = {
+                'Kopi Hitam': 15000,
+                'Cappuccino': 20000,
+                'Latte': 22000,
+                'Espresso': 18000,
+                'Croissant': 12000,
+                'Sandwich': 25000,
+                'Salad Buah': 18000
+            };
+            
+            let cart = [];
+            let total = 0;
+            
+            // Update tanggal pada nota
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit'
+                };
+                document.getElementById('receipt-date').textContent = now.toLocaleDateString('id-ID', options);
+            }
+            
+            // Generate nomor transaksi acak
+            function generateReceiptNumber() {
+                const randomNum = Math.floor(Math.random() * 1000);
+                return `TRX-${randomNum.toString().padStart(3, '0')}`;
+            }
+            
+            // Update total
+            function updateTotal() {
+                total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                document.getElementById('total-amount').textContent = total.toLocaleString('id-ID');
+            }
+            
+            // Update tampilan keranjang
+            function updateCartDisplay() {
+                const cartTable = document.getElementById('cart').querySelector('tbody');
+                cartTable.innerHTML = '';
+                
+                cart.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    const subtotal = item.price * item.quantity;
+                    
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>Rp ${item.price.toLocaleString('id-ID')}</td>
+                        <td>${item.quantity}</td>
+                        <td>Rp ${subtotal.toLocaleString('id-ID')}</td>
+                        <td><button class="remove-btn" data-index="${index}">Hapus</button></td>
+                    `;
+                    
+                    cartTable.appendChild(row);
+                });
+                
+                // Tambahkan event listener untuk tombol hapus
+                document.querySelectorAll('.remove-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        cart.splice(index, 1);
+                        updateCartDisplay();
+                        updateTotal();
+                    });
+                });
+            }
+            
+            // Tampilkan nota
+            function showReceipt(paymentAmount) {
+                const change = paymentAmount - total;
+                
+                // Isi detail nota
+                document.getElementById('receipt-number').textContent = generateReceiptNumber();
+                updateDateTime();
+                
+                // Isi item nota
+                const receiptItems = document.getElementById('receipt-items');
+                receiptItems.innerHTML = '';
+                
+                cart.forEach(item => {
+                    const subtotal = item.price * item.quantity;
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'nota-item';
+                    itemElement.innerHTML = `
+                        <span>${item.name} x${item.quantity}</span>
+                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    `;
+                    receiptItems.appendChild(itemElement);
+                });
+                
+                // Isi total, bayar, dan kembali
+                document.getElementById('receipt-total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+                document.getElementById('receipt-payment').textContent = `Rp ${paymentAmount.toLocaleString('id-ID')}`;
+                document.getElementById('receipt-change').textContent = `Rp ${change.toLocaleString('id-ID')}`;
+                
+                // Tampilkan nota dan sembunyikan placeholder
+                document.getElementById('receipt').style.display = 'block';
+                document.getElementById('no-receipt').style.display = 'none';
+            }
+            
+            // Event listener untuk menambah item
+            document.getElementById('add-item').addEventListener('click', function() {
+                const selectedItem = document.getElementById('item').value;
+                const quantity = parseInt(document.getElementById('quantity').value);
+                
+                if (!selectedItem) {
+                    alert('Pilih barang terlebih dahulu!');
+                    return;
+                }
+                
+                if (isNaN(quantity) || quantity <= 0) {
+                    alert('Masukkan jumlah yang valid!');
+                    return;
+                }
+                
+                // Tambahkan ke keranjang
+                cart.push({
+                    name: selectedItem,
+                    price: items[selectedItem],
+                    quantity: quantity
+                });
+                
+                // Update tampilan
+                updateCartDisplay();
+                updateTotal();
+                
+                // Reset input
+                document.getElementById('quantity').value = 1;
+            });
+            
+            // Event listener untuk pembayaran
+            document.getElementById('pay').addEventListener('click', function() {
+                if (cart.length === 0) {
+                    alert('Keranjang belanja kosong!');
+                    return;
+                }
+                
+                const paymentAmount = parseInt(document.getElementById('payment').value);
+                
+                if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                    alert('Masukkan jumlah pembayaran yang valid!');
+                    return;
+                }
+                
+                if (paymentAmount < total) {
+                    alert('Jumlah pembayaran kurang!');
+                    return;
+                }
+                
+                // Tampilkan nota
+                showReceipt(paymentAmount);
+            });
+            
+            // Event listener untuk reset transaksi
+            document.getElementById('reset').addEventListener('click', function() {
+                cart = [];
+                total = 0;
+                document.getElementById('payment').value = '';
+                updateCartDisplay();
+                updateTotal();
+            });
+            
+            // Event listener untuk transaksi baru
+            document.getElementById('new-transaction').addEventListener('click', function() {
+                cart = [];
+                total = 0;
+                document.getElementById('payment').value = '';
+                updateCartDisplay();
+                updateTotal();
+                
+                // Sembunyikan nota
+                document.getElementById('receipt').style.display = 'none';
+                document.getElementById('no-receipt').style.display = 'block';
+            });
+            
+            // Inisialisasi tanggal
+            updateDateTime();
+        });
+    </script>
+</body>
+</html>
