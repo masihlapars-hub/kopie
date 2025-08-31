@@ -171,6 +171,12 @@
         .whatsapp-btn:hover {
             background: #128C7E;
         }
+        .download-btn {
+            background: #f39c12;
+        }
+        .download-btn:hover {
+            background: #e67e22;
+        }
         .split-bill-btn {
             background: #9b59b6;
         }
@@ -452,6 +458,7 @@
                     
                     <div class="action-buttons">
                         <button onclick="window.print()" class="success-btn"><i class="fas fa-print"></i> Cetak Nota</button>
+                        <button id="download-receipt" class="download-btn"><i class="fas fa-download"></i> Download Nota</button>
                         <button id="whatsapp-btn" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Kirim via WhatsApp</button>
                         <button id="new-transaction" class="secondary-btn"><i class="fas fa-receipt"></i> Transaksi Baru</button>
                     </div>
@@ -855,6 +862,22 @@
                 document.getElementById('no-receipt').style.display = 'none';
             }
             
+            // Fungsi untuk download nota sebagai gambar
+            function downloadReceipt() {
+                if (cart.length === 0) {
+                    alert('Tidak ada transaksi untuk didownload!');
+                    return;
+                }
+                
+                html2canvas(document.getElementById('receipt')).then(canvas => {
+                    // Buat link untuk download
+                    const link = document.createElement('a');
+                    link.download = `nota-${document.getElementById('receipt-number').textContent}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            }
+            
             // Event listener untuk menambah item
             document.getElementById('add-item').addEventListener('click', function() {
                 const selectedItemName = document.getElementById('item').value;
@@ -928,6 +951,9 @@
                 // Catat pemasukan
                 addFinanceRecord('pemasukan', 'Penjualan', total);
             });
+            
+            // Event listener untuk download nota
+            document.getElementById('download-receipt').addEventListener('click', downloadReceipt);
             
             // Event listener untuk reset transaksi
             document.getElementById('reset').addEventListener('click', function() {
