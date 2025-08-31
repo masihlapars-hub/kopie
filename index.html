@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kasir - Kedai Kopi Ananda</title>
+    <title>Sistem Kasir Kopi Ananda</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
@@ -90,7 +90,6 @@
             font-size: 16px;
             font-weight: 600;
             transition: background 0.3s;
-            width: 100%;
         }
         button:hover {
             background: #2980b9;
@@ -299,6 +298,11 @@
         .negative {
             color: #e74c3c;
         }
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
         @media print {
             body * {
                 visibility: hidden;
@@ -383,6 +387,7 @@
                     <div class="input-group">
                         <label for="payment">Jumlah Bayar (Rp)</label>
                         <input type="number" id="payment" min="0">
+                        <div id="payment-error" class="error-message" style="display: none;">Jumlah pembayaran kurang!</div>
                     </div>
                     
                     <div class="action-buttons">
@@ -542,6 +547,9 @@
                 <label for="whatsapp-message">Pesan Nota</label>
                 <textarea id="whatsapp-message" rows="6" readonly></textarea>
             </div>
+            <div id="whatsapp-image-preview" style="display: none; margin-bottom: 15px;">
+                <p>Gambar nota akan dikirim sebagai lampiran</p>
+            </div>
             <button id="send-whatsapp" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Kirim Sekarang</button>
         </div>
     </div>
@@ -578,6 +586,7 @@
                 address: "Jl. Contoh No. 123, Jakarta",
                 phone: "Telp: (021) 123-4567"
             };
+            let splitBillData = null;
             
             // Load data dari localStorage jika ada
             function loadData() {
@@ -825,6 +834,17 @@
                     receiptItems.appendChild(itemElement);
                 });
                 
+                // Tambahkan info split bill jika ada
+                if (splitBillData) {
+                    const splitInfo = document.createElement('div');
+                    splitInfo.className = 'nota-item';
+                    splitInfo.innerHTML = `
+                        <span>Split Bill (${splitBillData.count} orang)</span>
+                        <span>Rp ${splitBillData.perPerson.toLocaleString('id-ID')} per orang</span>
+                    `;
+                    receiptItems.appendChild(splitInfo);
+                }
+                
                 // Isi total, bayar, dan kembali
                 document.getElementById('receipt-total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
                 document.getElementById('receipt-payment').textContent = `Rp ${paymentAmount.toLocaleString('id-ID')}`;
@@ -896,9 +916,11 @@
                 }
                 
                 if (paymentAmount < total) {
-                    alert('Jumlah pembayaran kurang!');
+                    document.getElementById('payment-error').style.display = 'block';
                     return;
                 }
+                
+                document.getElementById('payment-error').style.display = 'none';
                 
                 // Tampilkan nota
                 showReceipt(paymentAmount);
@@ -911,7 +933,9 @@
             document.getElementById('reset').addEventListener('click', function() {
                 cart = [];
                 total = 0;
+                splitBillData = null;
                 document.getElementById('payment').value = '';
+                document.getElementById('payment-error').style.display = 'none';
                 updateCartDisplay();
                 updateTotal();
             });
@@ -920,7 +944,9 @@
             document.getElementById('new-transaction').addEventListener('click', function() {
                 cart = [];
                 total = 0;
+                splitBillData = null;
                 document.getElementById('payment').value = '';
+                document.getElementById('payment-error').style.display = 'none';
                 updateCartDisplay();
                 updateTotal();
                 
@@ -1026,6 +1052,11 @@
                 
                 // Tampilkan modal
                 document.getElementById('whatsapp-modal').style.display = 'flex';
+                
+                // Konversi nota ke gambar
+                html2canvas(document.getElementById('receipt')).then(canvas => {
+                    document.getElementById('whatsapp-image-preview').style.display = 'block';
+                });
             });
             
             // Event listener untuk mengirim WhatsApp
@@ -1049,11 +1080,14 @@
                     // Konversi canvas ke data URL
                     const imageDataURL = canvas.toDataURL('image/png');
                     
-                    // Buat pesan dengan gambar
-                    const imageMessage = `${message}%0a%0a![Nota](${imageDataURL})`;
+                    // Simpan gambar ke localStorage untuk referensi
+                    localStorage.setItem('last_receipt_image', imageDataURL);
                     
-                    // Buka WhatsApp dengan pesan yang sudah diformat
-                    window.open(`https://wa.me/${phoneNumber}?text=${imageMessage}`, '_blank');
+                    // Buka WhatsApp dengan pesan teks
+                    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+                    
+                    // Tampilkan instruksi untuk mengirim gambar secara manual
+                    alert('Setelah membuka WhatsApp, silakan unggah gambar nota secara manual dari galeri atau tangkapan layar.');
                 });
                 
                 // Tutup modal
@@ -1089,15 +1123,14 @@
                 const splitCount = parseInt(document.getElementById('split-count').value) || 2;
                 const amountPerPerson = total / splitCount;
                 
-                // Update informasi di nota
-                const receiptItems = document.getElementById('receipt-items');
-                const splitInfo = document.createElement('div');
-                splitInfo.className = 'nota-item';
-                splitInfo.innerHTML = `
-                    <span>Split Bill (${splitCount} orang)</span>
-                    <span>Rp ${amountPerPerson.toLocaleString('id-ID')} per orang</span>
-                `;
-                receiptItems.appendChild(splitInfo);
+                // Simpan data split bill
+                splitBillData = {
+                    count: splitCount,
+                    perPerson: amountPerPerson
+                };
+                
+                // Set payment input ke jumlah per orang
+                document.getElementById('payment').value = amountPerPerson;
                 
                 // Tutup modal
                 document.getElementById('split-modal').style.display = 'none';
