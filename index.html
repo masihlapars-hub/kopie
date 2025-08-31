@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kasir Sederhana</title>
+    <title>Sistem Kasir Kopi Ananda</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -18,6 +19,35 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .admin-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .admin-btn:hover {
+            background: #c0392b;
+        }
+        .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
@@ -27,11 +57,6 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
         }
         h2 {
             color: #3498db;
@@ -47,7 +72,7 @@
             margin-bottom: 5px;
             font-weight: 600;
         }
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -140,6 +165,55 @@
         .success-btn:hover {
             background: #27ae60;
         }
+        .admin-panel {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .admin-section {
+            margin-bottom: 30px;
+        }
+        .admin-section h3 {
+            color: #e74c3c;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .menu-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        .menu-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .menu-actions button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
         @media print {
             body * {
                 visibility: hidden;
@@ -160,135 +234,258 @@
             }
         }
         @media (max-width: 768px) {
-            .container {
+            .main-content {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Sistem Kasir Sederhana</h1>
-    
     <div class="container">
-        <div class="panel">
-            <h2>Input Transaksi</h2>
-            
-            <div class="input-group">
-                <label for="item">Nama Barang</label>
-                <select id="item">
-                    <option value="">Pilih Barang</option>
-                    <option value="Kopi Hitam">Kopi Hitam - Rp 15.000</option>
-                    <option value="Cappuccino">Cappuccino - Rp 20.000</option>
-                    <option value="Latte">Latte - Rp 22.000</option>
-                    <option value="Espresso">Espresso - Rp 18.000</option>
-                    <option value="Croissant">Croissant - Rp 12.000</option>
-                    <option value="Sandwich">Sandwich - Rp 25.000</option>
-                    <option value="Salad Buah">Salad Buah - Rp 18.000</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label for="quantity">Jumlah</label>
-                <input type="number" id="quantity" min="1" value="1">
-            </div>
-            
-            <button id="add-item">Tambah ke Keranjang</button>
-            
-            <h2>Keranjang Belanja</h2>
-            <table id="cart">
-                <thead>
-                    <tr>
-                        <th>Barang</th>
-                        <th>Harga</th>
-                        <th>Jumlah</th>
-                        <th>Subtotal</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Items will be added here dynamically -->
-                </tbody>
-            </table>
-            
-            <div class="total-section">
-                Total: Rp <span id="total-amount">0</span>
-            </div>
-            
-            <div class="payment-section">
+        <div class="header">
+            <h1><i class="fas fa-coffee"></i> Kedai Kopi Ananda</h1>
+            <button class="admin-btn" id="show-admin"><i class="fas fa-cog"></i> Admin</button>
+        </div>
+        
+        <div class="main-content">
+            <div class="panel">
+                <h2>Input Transaksi</h2>
+                
                 <div class="input-group">
-                    <label for="payment">Jumlah Bayar (Rp)</label>
-                    <input type="number" id="payment" min="0">
+                    <label for="item">Nama Barang</label>
+                    <select id="item">
+                        <option value="">Pilih Barang</option>
+                    </select>
                 </div>
                 
-                <div class="action-buttons">
-                    <button id="reset" class="secondary-btn">Reset Transaksi</button>
-                    <button id="pay" class="success-btn">Bayar Sekarang</button>
+                <div class="input-group">
+                    <label for="quantity">Jumlah</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+                
+                <button id="add-item"><i class="fas fa-cart-plus"></i> Tambah ke Keranjang</button>
+                
+                <h2>Keranjang Belanja</h2>
+                <table id="cart">
+                    <thead>
+                        <tr>
+                            <th>Barang</th>
+                            <th>Harga</th>
+                            <th>Jumlah</th>
+                            <th>Subtotal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                
+                <div class="total-section">
+                    Total: Rp <span id="total-amount">0</span>
+                </div>
+                
+                <div class="payment-section">
+                    <div class="input-group">
+                        <label for="payment">Jumlah Bayar (Rp)</label>
+                        <input type="number" id="payment" min="0">
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="reset" class="secondary-btn"><i class="fas fa-trash"></i> Reset Transaksi</button>
+                        <button id="pay" class="success-btn"><i class="fas fa-credit-card"></i> Bayar Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Nota Transaksi</h2>
+                <div id="receipt" class="nota">
+                    <div class="nota-header">
+                        <h2 id="store-name">KEDAI KOPI ANANDA</h2>
+                        <p id="store-address">Jl. Contoh No. 123, Jakarta</p>
+                        <p id="store-phone">Telp: (021) 123-4567</p>
+                    </div>
+                    
+                    <div class="nota-detail">
+                        <p>No. Nota: <span id="receipt-number">TRX-001</span></p>
+                        <p>Tanggal: <span id="receipt-date">01/01/2023 10:00:00</span></p>
+                    </div>
+                    
+                    <div id="receipt-items">
+                    </div>
+                    
+                    <div class="nota-total">
+                        <div class="nota-item">
+                            <span>Total:</span>
+                            <span id="receipt-total">Rp 0</span>
+                        </div>
+                        <div class="nota-item">
+                            <span>Bayar:</span>
+                            <span id="receipt-payment">Rp 0</span>
+                        </div>
+                        <div class="nota-item">
+                            <span>Kembali:</span>
+                            <span id="receipt-change">Rp 0</span>
+                        </div>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 20px;">Terima kasih atas kunjungan Anda!</p>
+                    
+                    <div class="action-buttons">
+                        <button onclick="window.print()" class="success-btn"><i class="fas fa-print"></i> Cetak Nota</button>
+                        <button id="new-transaction" class="secondary-btn"><i class="fas fa-receipt"></i> Transaksi Baru</button>
+                    </div>
+                </div>
+                
+                <div id="no-receipt" style="text-align: center; padding: 40px 0;">
+                    <p><i class="fas fa-receipt" style="font-size: 48px; color: #ccc;"></i></p>
+                    <p>Nota akan muncul setelah melakukan pembayaran</p>
                 </div>
             </div>
         </div>
         
-        <div class="panel">
-            <h2>Nota Transaksi</h2>
-            <div id="receipt" class="nota">
-                <div class="nota-header">
-                    <h2>KEDAI KOPI ANANDA</h2>
-                    <p>Jl. Contoh No. 123, Jakarta</p>
-                    <p>Telp: (021) 123-4567</p>
+        <div id="admin-panel" class="admin-panel">
+            <h2>Panel Admin</h2>
+            
+            <div class="admin-section">
+                <h3>Kelola Menu</h3>
+                
+                <div class="input-group">
+                    <label for="new-item-name">Nama Menu Baru</label>
+                    <input type="text" id="new-item-name" placeholder="Contoh: Kopi Susu">
                 </div>
                 
-                <div class="nota-detail">
-                    <p>No. Nota: <span id="receipt-number">TRX-001</span></p>
-                    <p>Tanggal: <span id="receipt-date">01/01/2023 10:00:00</span></p>
+                <div class="input-group">
+                    <label for="new-item-price">Harga (Rp)</label>
+                    <input type="number" id="new-item-price" placeholder="Contoh: 15000">
                 </div>
                 
-                <div id="receipt-items">
-                    <!-- Items will be added here dynamically -->
-                </div>
+                <button id="add-new-item"><i class="fas fa-plus"></i> Tambah Menu</button>
                 
-                <div class="nota-total">
-                    <div class="nota-item">
-                        <span>Total:</span>
-                        <span id="receipt-total">Rp 0</span>
-                    </div>
-                    <div class="nota-item">
-                        <span>Bayar:</span>
-                        <span id="receipt-payment">Rp 0</span>
-                    </div>
-                    <div class="nota-item">
-                        <span>Kembali:</span>
-                        <span id="receipt-change">Rp 0</span>
-                    </div>
-                </div>
-                
-                <p style="text-align: center; margin-top: 20px;">Terima kasih atas kunjungan Anda!</p>
-                
-                <div class="action-buttons">
-                    <button onclick="window.print()" class="success-btn">Cetak Nota</button>
-                    <button id="new-transaction" class="secondary-btn">Transaksi Baru</button>
+                <h4>Daftar Menu Tersedia</h4>
+                <div id="menu-list" class="menu-list">
+                    <!-- Daftar menu akan dimuat di sini -->
                 </div>
             </div>
             
-            <div id="no-receipt" style="text-align: center; padding: 40px 0;">
-                <p>Nota akan muncul setelah melakukan pembayaran</p>
+            <div class="admin-section">
+                <h3>Edit Informasi Nota</h3>
+                
+                <div class="input-group">
+                    <label for="edit-store-name">Nama Toko</label>
+                    <input type="text" id="edit-store-name" placeholder="Nama toko Anda">
+                </div>
+                
+                <div class="input-group">
+                    <label for="edit-store-address">Alamat Toko</label>
+                    <textarea id="edit-store-address" placeholder="Alamat lengkap toko"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="edit-store-phone">Telepon</label>
+                    <input type="text" id="edit-store-phone" placeholder="Nomor telepon toko">
+                </div>
+                
+                <button id="save-store-info"><i class="fas fa-save"></i> Simpan Informasi</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="close-admin" class="secondary-btn"><i class="fas fa-times"></i> Tutup Panel Admin</button>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Data harga barang
-            const items = {
-                'Kopi Hitam': 15000,
-                'Cappuccino': 20000,
-                'Latte': 22000,
-                'Espresso': 18000,
-                'Croissant': 12000,
-                'Sandwich': 25000,
-                'Salad Buah': 18000
-            };
-            
+            // Inisialisasi data
             let cart = [];
             let total = 0;
+            let items = [];
+            let storeInfo = {
+                name: "KEDAI KOPI ANANDA",
+                address: "Jl. Contoh No. 123, Jakarta",
+                phone: "Telp: (021) 123-4567"
+            };
+            
+            // Load data dari localStorage jika ada
+            function loadData() {
+                const savedItems = localStorage.getItem('cashier_items');
+                const savedStoreInfo = localStorage.getItem('cashier_store_info');
+                
+                if (savedItems) {
+                    items = JSON.parse(savedItems);
+                } else {
+                    // Data default jika tidak ada di localStorage
+                    items = [
+                        { name: 'Kopi Hitam', price: 15000 },
+                        { name: 'Cappuccino', price: 20000 },
+                        { name: 'Latte', price: 22000 },
+                        { name: 'Espresso', price: 18000 },
+                        { name: 'Croissant', price: 12000 },
+                        { name: 'Sandwich', price: 25000 },
+                        { name: 'Salad Buah', price: 18000 }
+                    ];
+                }
+                
+                if (savedStoreInfo) {
+                    storeInfo = JSON.parse(savedStoreInfo);
+                }
+                
+                updateItemDropdown();
+                updateMenuList();
+                updateStoreInfo();
+            }
+            
+            // Simpan data ke localStorage
+            function saveData() {
+                localStorage.setItem('cashier_items', JSON.stringify(items));
+                localStorage.setItem('cashier_store_info', JSON.stringify(storeInfo));
+            }
+            
+            // Update dropdown item
+            function updateItemDropdown() {
+                const itemDropdown = document.getElementById('item');
+                itemDropdown.innerHTML = '<option value="">Pilih Barang</option>';
+                
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.name;
+                    option.textContent = `${item.name} - Rp ${item.price.toLocaleString('id-ID')}`;
+                    itemDropdown.appendChild(option);
+                });
+            }
+            
+            // Update daftar menu di panel admin
+            function updateMenuList() {
+                const menuList = document.getElementById('menu-list');
+                menuList.innerHTML = '';
+                
+                items.forEach((item, index) => {
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item';
+                    menuItem.innerHTML = `
+                        <div>
+                            <strong>${item.name}</strong> - Rp ${item.price.toLocaleString('id-ID')}
+                        </div>
+                        <div class="menu-actions">
+                            <button class="secondary-btn" onclick="editItem(${index})"><i class="fas fa-edit"></i></button>
+                            <button class="admin-btn" onclick="deleteItem(${index})" style="width: auto; padding: 5px 10px;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    menuList.appendChild(menuItem);
+                });
+            }
+            
+            // Update informasi toko
+            function updateStoreInfo() {
+                document.getElementById('store-name').textContent = storeInfo.name;
+                document.getElementById('store-address').textContent = storeInfo.address;
+                document.getElementById('store-phone').textContent = storeInfo.phone;
+                
+                document.getElementById('edit-store-name').value = storeInfo.name;
+                document.getElementById('edit-store-address').value = storeInfo.address;
+                document.getElementById('edit-store-phone').value = storeInfo.phone;
+            }
             
             // Update tanggal pada nota
             function updateDateTime() {
@@ -330,7 +527,7 @@
                         <td>Rp ${item.price.toLocaleString('id-ID')}</td>
                         <td>${item.quantity}</td>
                         <td>Rp ${subtotal.toLocaleString('id-ID')}</td>
-                        <td><button class="remove-btn" data-index="${index}">Hapus</button></td>
+                        <td><button class="remove-btn" data-index="${index}" style="width: auto; padding: 5px 10px;"><i class="fas fa-trash"></i></button></td>
                     `;
                     
                     cartTable.appendChild(row);
@@ -382,10 +579,10 @@
             
             // Event listener untuk menambah item
             document.getElementById('add-item').addEventListener('click', function() {
-                const selectedItem = document.getElementById('item').value;
+                const selectedItemName = document.getElementById('item').value;
                 const quantity = parseInt(document.getElementById('quantity').value);
                 
-                if (!selectedItem) {
+                if (!selectedItemName) {
                     alert('Pilih barang terlebih dahulu!');
                     return;
                 }
@@ -395,10 +592,18 @@
                     return;
                 }
                 
+                // Cari item yang dipilih dari daftar items
+                const selectedItem = items.find(item => item.name === selectedItemName);
+                
+                if (!selectedItem) {
+                    alert('Barang tidak ditemukan!');
+                    return;
+                }
+                
                 // Tambahkan ke keranjang
                 cart.push({
-                    name: selectedItem,
-                    price: items[selectedItem],
+                    name: selectedItem.name,
+                    price: selectedItem.price,
                     quantity: quantity
                 });
                 
@@ -455,7 +660,100 @@
                 document.getElementById('no-receipt').style.display = 'block';
             });
             
-            // Inisialisasi tanggal
+            // Event listener untuk panel admin
+            document.getElementById('show-admin').addEventListener('click', function() {
+                const password = prompt('Masukkan password admin:');
+                if (password === '281105') {
+                    document.getElementById('admin-panel').style.display = 'block';
+                } else {
+                    alert('Password salah!');
+                }
+            });
+            
+            document.getElementById('close-admin').addEventListener('click', function() {
+                document.getElementById('admin-panel').style.display = 'none';
+            });
+            
+            // Event listener untuk menambah menu baru
+            document.getElementById('add-new-item').addEventListener('click', function() {
+                const newItemName = document.getElementById('new-item-name').value.trim();
+                const newItemPrice = parseInt(document.getElementById('new-item-price').value);
+                
+                if (!newItemName) {
+                    alert('Masukkan nama menu!');
+                    return;
+                }
+                
+                if (isNaN(newItemPrice) || newItemPrice <= 0) {
+                    alert('Masukkan harga yang valid!');
+                    return;
+                }
+                
+                // Tambahkan menu baru
+                items.push({
+                    name: newItemName,
+                    price: newItemPrice
+                });
+                
+                // Simpan dan update tampilan
+                saveData();
+                updateItemDropdown();
+                updateMenuList();
+                
+                // Reset form
+                document.getElementById('new-item-name').value = '';
+                document.getElementById('new-item-price').value = '';
+                
+                alert('Menu berhasil ditambahkan!');
+            });
+            
+            // Event listener untuk menyimpan informasi toko
+            document.getElementById('save-store-info').addEventListener('click', function() {
+                storeInfo.name = document.getElementById('edit-store-name').value;
+                storeInfo.address = document.getElementById('edit-store-address').value;
+                storeInfo.phone = document.getElementById('edit-store-phone').value;
+                
+                saveData();
+                updateStoreInfo();
+                
+                alert('Informasi toko berhasil disimpan!');
+            });
+            
+            // Fungsi global untuk mengedit item (dipanggil dari onclick)
+            window.editItem = function(index) {
+                const newName = prompt('Masukkan nama baru:', items[index].name);
+                if (newName === null) return;
+                
+                const newPrice = parseInt(prompt('Masukkan harga baru:', items[index].price));
+                if (isNaN(newPrice)) {
+                    alert('Harga tidak valid!');
+                    return;
+                }
+                
+                items[index].name = newName;
+                items[index].price = newPrice;
+                
+                saveData();
+                updateItemDropdown();
+                updateMenuList();
+                
+                alert('Menu berhasil diubah!');
+            };
+            
+            // Fungsi global untuk menghapus item (dipanggil dari onclick)
+            window.deleteItem = function(index) {
+                if (confirm(`Apakah Anda yakin ingin menghapus ${items[index].name}?`)) {
+                    items.splice(index, 1);
+                    saveData();
+                    updateItemDropdown();
+                    updateMenuList();
+                    
+                    alert('Menu berhasil dihapus!');
+                }
+            };
+            
+            // Inisialisasi
+            loadData();
             updateDateTime();
         });
     </script>
