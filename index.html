@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kasir Kopi Ananda</title>
+    <title>Sistem Kasir - Dapat Dikustomisasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -165,6 +165,12 @@
         .success-btn:hover {
             background: #27ae60;
         }
+        .whatsapp-btn {
+            background: #25D366;
+        }
+        .whatsapp-btn:hover {
+            background: #128C7E;
+        }
         .admin-panel {
             display: none;
             background: white;
@@ -206,13 +212,66 @@
             padding: 5px 10px;
             font-size: 14px;
         }
-        .login-form {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
+        .whatsapp-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .whatsapp-modal-content {
             background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            width: auto;
+            color: #999;
+        }
+        .setup-panel {
+            background: white;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
+            max-width: 600px;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom: 2px solid #3498db;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         @media print {
             body * {
@@ -237,13 +296,94 @@
             .main-content {
                 grid-template-columns: 1fr;
             }
+            .action-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="setup-container" class="setup-panel">
+        <h2 style="text-align: center; margin-bottom: 30px;">Setup Awal Sistem Kasir</h2>
+        
+        <div class="tab-container">
+            <div class="tab active" data-tab="basic">Informasi Dasar</div>
+            <div class="tab" data-tab="menu">Menu Awal</div>
+            <div class="tab" data-tab="security">Keamanan</div>
+        </div>
+        
+        <div class="tab-content active" id="basic-tab">
+            <div class="input-group">
+                <label for="setup-store-name">Nama Toko/Kedai</label>
+                <input type="text" id="setup-store-name" placeholder="Contoh: Kedai Kopi Ananda">
+            </div>
+            
+            <div class="input-group">
+                <label for="setup-store-address">Alamat Toko</label>
+                <textarea id="setup-store-address" placeholder="Alamat lengkap toko"></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="setup-store-phone">Telepon</label>
+                <input type="text" id="setup-store-phone" placeholder="Nomor telepon toko">
+            </div>
+            
+            <button id="next-to-menu" class="success-btn">Lanjut ke Menu</button>
+        </div>
+        
+        <div class="tab-content" id="menu-tab">
+            <div class="input-group">
+                <label for="default-menu">Pilih Jenis Menu Default</label>
+                <select id="default-menu">
+                    <option value="coffee">Kedai Kopi</option>
+                    <option value="restaurant">Restoran</option>
+                    <option value="snack">Kedai Snack</option>
+                    <option value="custom">Kustom Sendiri</option>
+                </select>
+            </div>
+            
+            <div id="custom-menu-container" style="display: none;">
+                <h4>Tambah Menu Kustom</h4>
+                <div class="input-group">
+                    <label for="custom-item-name">Nama Menu</label>
+                    <input type="text" id="custom-item-name" placeholder="Nama menu">
+                </div>
+                
+                <div class="input-group">
+                    <label for="custom-item-price">Harga (Rp)</label>
+                    <input type="number" id="custom-item-price" placeholder="Harga">
+                </div>
+                
+                <button id="add-custom-item">Tambah Menu</button>
+                
+                <div id="custom-menu-list" class="menu-list">
+                    <!-- Daftar menu kustom akan muncul di sini -->
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="back-to-basic" class="secondary-btn">Kembali</button>
+                <button id="next-to-security" class="success-btn">Lanjut ke Keamanan</button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="security-tab">
+            <div class="input-group">
+                <label for="admin-password">Password Admin</label>
+                <input type="password" id="admin-password" placeholder="Password untuk akses admin">
+                <small>Gunakan password yang mudah diingat. Password ini dapat diubah nanti.</small>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="back-to-menu" class="secondary-btn">Kembali</button>
+                <button id="save-setup" class="success-btn">Simpan & Mulai</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="container" style="display: none;">
         <div class="header">
-            <h1><i class="fas fa-coffee"></i> Kedai Kopi Ananda</h1>
+            <h1><i class="fas fa-coffee"></i> <span id="header-store-name">Kedai Kopi Ananda</span></h1>
             <button class="admin-btn" id="show-admin"><i class="fas fa-cog"></i> Admin</button>
         </div>
         
@@ -333,6 +473,7 @@
                     
                     <div class="action-buttons">
                         <button onclick="window.print()" class="success-btn"><i class="fas fa-print"></i> Cetak Nota</button>
+                        <button id="whatsapp-btn" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Kirim via WhatsApp</button>
                         <button id="new-transaction" class="secondary-btn"><i class="fas fa-receipt"></i> Transaksi Baru</button>
                     </div>
                 </div>
@@ -369,7 +510,7 @@
             </div>
             
             <div class="admin-section">
-                <h3>Edit Informasi Nota</h3>
+                <h3>Edit Informasi Toko</h3>
                 
                 <div class="input-group">
                     <label for="edit-store-name">Nama Toko</label>
@@ -389,9 +530,50 @@
                 <button id="save-store-info"><i class="fas fa-save"></i> Simpan Informasi</button>
             </div>
             
+            <div class="admin-section">
+                <h3>Ubah Password Admin</h3>
+                
+                <div class="input-group">
+                    <label for="current-password">Password Saat Ini</label>
+                    <input type="password" id="current-password">
+                </div>
+                
+                <div class="input-group">
+                    <label for="new-password">Password Baru</label>
+                    <input type="password" id="new-password">
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirm-password">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirm-password">
+                </div>
+                
+                <button id="change-password"><i class="fas fa-key"></i> Ubah Password</button>
+            </div>
+            
             <div class="action-buttons">
                 <button id="close-admin" class="secondary-btn"><i class="fas fa-times"></i> Tutup Panel Admin</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal WhatsApp -->
+    <div id="whatsapp-modal" class="whatsapp-modal">
+        <div class="whatsapp-modal-content">
+            <div class="modal-header">
+                <h3>Kirim via WhatsApp</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="input-group">
+                <label for="customer-phone">Nomor WhatsApp Pelanggan</label>
+                <input type="text" id="customer-phone" placeholder="Contoh: 628123456789">
+                <small>Format: 62xxxxxxxxxxx (tanpa + atau 0 di depan)</small>
+            </div>
+            <div class="input-group">
+                <label for="whatsapp-message">Pesan Nota</label>
+                <textarea id="whatsapp-message" rows="6" readonly></textarea>
+            </div>
+            <button id="send-whatsapp" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Kirim Sekarang</button>
         </div>
     </div>
 
@@ -402,33 +584,47 @@
             let total = 0;
             let items = [];
             let storeInfo = {
-                name: "KEDAI KOPI ANANDA",
+                name: "Kedai Kopi Ananda",
                 address: "Jl. Contoh No. 123, Jakarta",
                 phone: "Telp: (021) 123-4567"
             };
+            let adminPassword = "281105";
+            let customMenuItems = [];
+            
+            // Cek apakah sudah ada setup
+            function checkSetup() {
+                const savedStoreInfo = localStorage.getItem('cashier_store_info');
+                const savedItems = localStorage.getItem('cashier_items');
+                const savedPassword = localStorage.getItem('cashier_admin_password');
+                
+                if (savedStoreInfo && savedItems && savedPassword) {
+                    // Sudah ada setup, langsung tampilkan aplikasi
+                    loadData();
+                    document.getElementById('setup-container').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'block';
+                } else {
+                    // Belum ada setup, tampilkan setup panel
+                    document.getElementById('setup-container').style.display = 'block';
+                    document.getElementById('app-container').style.display = 'none';
+                }
+            }
             
             // Load data dari localStorage jika ada
             function loadData() {
                 const savedItems = localStorage.getItem('cashier_items');
                 const savedStoreInfo = localStorage.getItem('cashier_store_info');
+                const savedPassword = localStorage.getItem('cashier_admin_password');
                 
                 if (savedItems) {
                     items = JSON.parse(savedItems);
-                } else {
-                    // Data default jika tidak ada di localStorage
-                    items = [
-                        { name: 'Kopi Hitam', price: 15000 },
-                        { name: 'Cappuccino', price: 20000 },
-                        { name: 'Latte', price: 22000 },
-                        { name: 'Espresso', price: 18000 },
-                        { name: 'Croissant', price: 12000 },
-                        { name: 'Sandwich', price: 25000 },
-                        { name: 'Salad Buah', price: 18000 }
-                    ];
                 }
                 
                 if (savedStoreInfo) {
                     storeInfo = JSON.parse(savedStoreInfo);
+                }
+                
+                if (savedPassword) {
+                    adminPassword = savedPassword;
                 }
                 
                 updateItemDropdown();
@@ -440,6 +636,37 @@
             function saveData() {
                 localStorage.setItem('cashier_items', JSON.stringify(items));
                 localStorage.setItem('cashier_store_info', JSON.stringify(storeInfo));
+                localStorage.setItem('cashier_admin_password', adminPassword);
+            }
+            
+            // Setup default menu berdasarkan pilihan
+            function setupDefaultMenu(type) {
+                if (type === 'coffee') {
+                    return [
+                        { name: 'Kopi Hitam', price: 15000 },
+                        { name: 'Cappuccino', price: 20000 },
+                        { name: 'Latte', price: 22000 },
+                        { name: 'Espresso', price: 18000 },
+                        { name: 'Americano', price: 16000 }
+                    ];
+                } else if (type === 'restaurant') {
+                    return [
+                        { name: 'Nasi Goreng', price: 25000 },
+                        { name: 'Mie Goreng', price: 22000 },
+                        { name: 'Ayam Bakar', price: 30000 },
+                        { name: 'Sate Ayam', price: 28000 },
+                        { name: 'Gado-gado', price: 20000 }
+                    ];
+                } else if (type === 'snack') {
+                    return [
+                        { name: 'Roti Bakar', price: 12000 },
+                        { name: 'Pisang Goreng', price: 10000 },
+                        { name: 'Martabak', price: 25000 },
+                        { name: 'Donat', price: 8000 },
+                        { name: 'Kue Lapis', price: 7000 }
+                    ];
+                }
+                return customMenuItems;
             }
             
             // Update dropdown item
@@ -481,6 +708,9 @@
                 document.getElementById('store-name').textContent = storeInfo.name;
                 document.getElementById('store-address').textContent = storeInfo.address;
                 document.getElementById('store-phone').textContent = storeInfo.phone;
+                
+                document.getElementById('header-store-name').textContent = storeInfo.name;
+                document.title = storeInfo.name;
                 
                 document.getElementById('edit-store-name').value = storeInfo.name;
                 document.getElementById('edit-store-address').value = storeInfo.address;
@@ -544,6 +774,32 @@
                 });
             }
             
+            // Format pesan untuk WhatsApp
+            function formatWhatsAppMessage() {
+                let message = `*${storeInfo.name}*\n`;
+                message += `${storeInfo.address}\n`;
+                message += `${storeInfo.phone}\n\n`;
+                
+                message += `*NOTA PEMBELIAN*\n`;
+                message += `No. Nota: ${document.getElementById('receipt-number').textContent}\n`;
+                message += `Tanggal: ${document.getElementById('receipt-date').textContent}\n\n`;
+                
+                message += '*Item Pembelian:*\n';
+                cart.forEach(item => {
+                    const subtotal = item.price * item.quantity;
+                    message += `- ${item.name} x${item.quantity} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+                });
+                
+                message += '\n';
+                message += `Total: Rp ${total.toLocaleString('id-ID')}\n`;
+                message += `Bayar: Rp ${parseInt(document.getElementById('payment').value).toLocaleString('id-ID')}\n`;
+                message += `Kembali: Rp ${(parseInt(document.getElementById('payment').value) - total).toLocaleString('id-ID')}\n\n`;
+                
+                message += 'Terima kasih atas kunjungan Anda!';
+                
+                return message;
+            }
+            
             // Tampilkan nota
             function showReceipt(paymentAmount) {
                 const change = paymentAmount - total;
@@ -576,6 +832,116 @@
                 document.getElementById('receipt').style.display = 'block';
                 document.getElementById('no-receipt').style.display = 'none';
             }
+            
+            // Event listener untuk setup
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Nonaktifkan semua tab
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Aktifkan tab yang diklik
+                    this.classList.add('active');
+                    document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            document.getElementById('next-to-menu').addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                document.querySelector('[data-tab="menu"]').classList.add('active');
+                document.getElementById('menu-tab').classList.add('active');
+            });
+            
+            document.getElementById('back-to-basic').addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                document.querySelector('[data-tab="basic"]').classList.add('active');
+                document.getElementById('basic-tab').classList.add('active');
+            });
+            
+            document.getElementById('next-to-security').addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                document.querySelector('[data-tab="security"]').classList.add('active');
+                document.getElementById('security-tab').classList.add('active');
+            });
+            
+            document.getElementById('back-to-menu').addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                document.querySelector('[data-tab="menu"]').classList.add('active');
+                document.getElementById('menu-tab').classList.add('active');
+            });
+            
+            document.getElementById('default-menu').addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    document.getElementById('custom-menu-container').style.display = 'block';
+                } else {
+                    document.getElementById('custom-menu-container').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('add-custom-item').addEventListener('click', function() {
+                const name = document.getElementById('custom-item-name').value.trim();
+                const price = parseInt(document.getElementById('custom-item-price').value);
+                
+                if (!name) {
+                    alert('Masukkan nama menu!');
+                    return;
+                }
+                
+                if (isNaN(price) || price <= 0) {
+                    alert('Masukkan harga yang valid!');
+                    return;
+                }
+                
+                customMenuItems.push({ name, price });
+                
+                // Update tampilan
+                const menuList = document.getElementById('custom-menu-list');
+                const itemElement = document.createElement('div');
+                itemElement.className = 'menu-item';
+                itemElement.innerHTML = `
+                    <div>${name} - Rp ${price.toLocaleString('id-ID')}</div>
+                    <button class="admin-btn" onclick="removeCustomItem(${customMenuItems.length - 1})" style="width: auto; padding: 5px 10px;"><i class="fas fa-trash"></i></button>
+                `;
+                menuList.appendChild(itemElement);
+                
+                // Reset form
+                document.getElementById('custom-item-name').value = '';
+                document.getElementById('custom-item-price').value = '';
+            });
+            
+            document.getElementById('save-setup').addEventListener('click', function() {
+                // Simpan informasi toko
+                storeInfo.name = document.getElementById('setup-store-name').value;
+                storeInfo.address = document.getElementById('setup-store-address').value;
+                storeInfo.phone = document.getElementById('setup-store-phone').value;
+                
+                // Simpan password admin
+                adminPassword = document.getElementById('admin-password').value;
+                
+                // Setup menu
+                const menuType = document.getElementById('default-menu').value;
+                items = setupDefaultMenu(menuType);
+                
+                // Simpan semua data
+                saveData();
+                
+                // Sembunyikan setup, tampilkan aplikasi
+                document.getElementById('setup-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                
+                // Update tampilan
+                updateItemDropdown();
+                updateMenuList();
+                updateStoreInfo();
+            });
             
             // Event listener untuk menambah item
             document.getElementById('add-item').addEventListener('click', function() {
@@ -663,7 +1029,7 @@
             // Event listener untuk panel admin
             document.getElementById('show-admin').addEventListener('click', function() {
                 const password = prompt('Masukkan password admin:');
-                if (password === '281105') {
+                if (password === adminPassword) {
                     document.getElementById('admin-panel').style.display = 'block';
                 } else {
                     alert('Password salah!');
@@ -719,6 +1085,88 @@
                 alert('Informasi toko berhasil disimpan!');
             });
             
+            // Event listener untuk mengubah password
+            document.getElementById('change-password').addEventListener('click', function() {
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (currentPassword !== adminPassword) {
+                    alert('Password saat ini salah!');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    alert('Konfirmasi password tidak sesuai!');
+                    return;
+                }
+                
+                if (newPassword.length < 4) {
+                    alert('Password minimal 4 karakter!');
+                    return;
+                }
+                
+                adminPassword = newPassword;
+                saveData();
+                
+                alert('Password berhasil diubah!');
+                
+                // Reset form
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+            });
+            
+            // Event listener untuk tombol WhatsApp
+            document.getElementById('whatsapp-btn').addEventListener('click', function() {
+                if (cart.length === 0) {
+                    alert('Tidak ada transaksi untuk dikirim!');
+                    return;
+                }
+                
+                // Format pesan untuk WhatsApp
+                const message = formatWhatsAppMessage();
+                document.getElementById('whatsapp-message').value = message;
+                
+                // Tampilkan modal
+                document.getElementById('whatsapp-modal').style.display = 'flex';
+            });
+            
+            // Event listener untuk mengirim WhatsApp
+            document.getElementById('send-whatsapp').addEventListener('click', function() {
+                const phoneNumber = document.getElementById('customer-phone').value.trim();
+                const message = encodeURIComponent(document.getElementById('whatsapp-message').value);
+                
+                if (!phoneNumber) {
+                    alert('Masukkan nomor WhatsApp terlebih dahulu!');
+                    return;
+                }
+                
+                // Validasi nomor telepon (minimal 10 digit, hanya angka)
+                if (!/^\d{10,}$/.test(phoneNumber)) {
+                    alert('Masukkan nomor WhatsApp yang valid!');
+                    return;
+                }
+                
+                // Buka WhatsApp dengan pesan yang sudah diformat
+                window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+                
+                // Tutup modal
+                document.getElementById('whatsapp-modal').style.display = 'none';
+            });
+            
+            // Event listener untuk menutup modal
+            document.querySelector('.close-modal').addEventListener('click', function() {
+                document.getElementById('whatsapp-modal').style.display = 'none';
+            });
+            
+            // Tutup modal jika klik di luar area modal
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('whatsapp-modal')) {
+                    document.getElementById('whatsapp-modal').style.display = 'none';
+                }
+            });
+            
             // Fungsi global untuk mengedit item (dipanggil dari onclick)
             window.editItem = function(index) {
                 const newName = prompt('Masukkan nama baru:', items[index].name);
@@ -752,8 +1200,27 @@
                 }
             };
             
+            // Fungsi global untuk menghapus item kustom (dipanggil dari onclick)
+            window.removeCustomItem = function(index) {
+                customMenuItems.splice(index, 1);
+                
+                // Update tampilan
+                const menuList = document.getElementById('custom-menu-list');
+                menuList.innerHTML = '';
+                
+                customMenuItems.forEach((item, idx) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'menu-item';
+                    itemElement.innerHTML = `
+                        <div>${item.name} - Rp ${item.price.toLocaleString('id-ID')}</div>
+                        <button class="admin-btn" onclick="removeCustomItem(${idx})" style="width: auto; padding: 5px 10px;"><i class="fas fa-trash"></i></button>
+                    `;
+                    menuList.appendChild(itemElement);
+                });
+            };
+            
             // Inisialisasi
-            loadData();
+            checkSetup();
             updateDateTime();
         });
     </script>
