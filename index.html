@@ -309,6 +309,11 @@
             font-size: 14px;
             margin-top: 5px;
         }
+        .success-message {
+            color: #2ecc71;
+            font-size: 14px;
+            margin-top: 5px;
+        }
         @media print {
             body * {
                 visibility: hidden;
@@ -517,6 +522,28 @@
             </div>
             
             <div class="admin-section">
+                <h3>Ubah Password Admin</h3>
+                
+                <div class="input-group">
+                    <label for="current-password">Password Saat Ini</label>
+                    <input type="password" id="current-password" placeholder="Masukkan password saat ini">
+                </div>
+                
+                <div class="input-group">
+                    <label for="new-password">Password Baru</label>
+                    <input type="password" id="new-password" placeholder="Masukkan password baru">
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirm-password">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirm-password" placeholder="Konfirmasi password baru">
+                </div>
+                
+                <button id="change-password"><i class="fas fa-key"></i> Ubah Password</button>
+                <div id="password-message" style="margin-top: 10px;"></div>
+            </div>
+            
+            <div class="admin-section">
                 <h3>Catat Pengeluaran</h3>
                 
                 <div class="input-group">
@@ -594,12 +621,14 @@
                 phone: "Telp: (021) 123-4567"
             };
             let splitBillData = null;
+            let adminPassword = "281105"; // Password default
             
             // Load data dari localStorage jika ada
             function loadData() {
                 const savedItems = localStorage.getItem('cashier_items');
                 const savedStoreInfo = localStorage.getItem('cashier_store_info');
                 const savedFinance = localStorage.getItem('cashier_finance');
+                const savedPassword = localStorage.getItem('cashier_admin_password');
                 
                 if (savedItems) {
                     items = JSON.parse(savedItems);
@@ -625,6 +654,10 @@
                     updateFinanceDisplay();
                 }
                 
+                if (savedPassword) {
+                    adminPassword = savedPassword;
+                }
+                
                 updateItemDropdown();
                 updateMenuList();
                 updateStoreInfo();
@@ -635,6 +668,7 @@
                 localStorage.setItem('cashier_items', JSON.stringify(items));
                 localStorage.setItem('cashier_store_info', JSON.stringify(storeInfo));
                 localStorage.setItem('cashier_finance', JSON.stringify(financeRecords));
+                localStorage.setItem('cashier_admin_password', adminPassword);
             }
             
             // Update dropdown item
@@ -984,7 +1018,7 @@
             // Event listener untuk panel admin
             document.getElementById('show-admin').addEventListener('click', function() {
                 const password = prompt('Masukkan password admin:');
-                if (password === '281105') {
+                if (password === adminPassword) {
                     document.getElementById('admin-panel').style.display = 'block';
                 } else {
                     alert('Password salah!');
@@ -1038,6 +1072,44 @@
                 updateStoreInfo();
                 
                 alert('Informasi toko berhasil disimpan!');
+            });
+            
+            // Event listener untuk mengubah password
+            document.getElementById('change-password').addEventListener('click', function() {
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                const messageElement = document.getElementById('password-message');
+                
+                if (currentPassword !== adminPassword) {
+                    messageElement.textContent = 'Password saat ini salah!';
+                    messageElement.className = 'error-message';
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    messageElement.textContent = 'Konfirmasi password tidak sesuai!';
+                    messageElement.className = 'error-message';
+                    return;
+                }
+                
+                if (newPassword.length < 4) {
+                    messageElement.textContent = 'Password minimal 4 karakter!';
+                    messageElement.className = 'error-message';
+                    return;
+                }
+                
+                adminPassword = newPassword;
+                saveData();
+                
+                messageElement.textContent = 'Password berhasil diubah!';
+                messageElement.className = 'success-message';
+                
+                // Reset form
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
             });
             
             // Event listener untuk menambah pengeluaran
